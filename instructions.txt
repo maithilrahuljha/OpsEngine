@@ -1,0 +1,562 @@
+================================================================================
+  PARAMOUNT OpsEngine — COMPLETE DEPLOYMENT MANUAL
+  How to put this website LIVE at:  https://paramountmerchantnavy.com
+================================================================================
+
+This manual is written for a NON-TECHNICAL person. You do not need to know any
+programming. Just follow each step exactly, in order, like a recipe.
+
+  ⏱  Total hands-on time: about 60–75 minutes.
+  ⏳  Plus a waiting period (15 min to a few hours) for your domain to activate.
+
+--------------------------------------------------------------------------------
+  WHAT THIS APP DOES (so you know what you are deploying)
+--------------------------------------------------------------------------------
+Paramount OpsEngine is the internal operations platform for the institute.
+It has SEVEN sections in the left-hand menu:
+
+   📊  Command Center        — live dashboard (cadet count, occupancy, revenue,
+                               admissions funnel, CBT ranks)
+   📈  Admissions CRM        — SALES TEAM tool: track every enquiry from first
+                               call to final enrolment (NEW here — see below)
+   🎖️  Cadet Directory       — full list of enrolled cadets
+   🏢  Hostel & Discipline   — beds, nightly roll-call, incident register
+   🩺  Medical Pre-Screen    — 6/6 vision & colour-blindness checks
+   ⚓  Sponsorship Vivas     — mock interview scoring for shipping companies
+   📝  CBT Examination Hub   — mock test results and All-India Ranks
+
+There are SIX types of login (called "roles"). Each role can see and do
+different things:
+
+   • Director General   — sees everything, can change nothing (read-only)
+   • COO                — full control of cadets, hostels, medical, and CRM
+   • Campus Manager     — same as COO for their campus
+   • Academic Lead      — manages CBT exams and sponsorship vivas
+   • Chief Warden       — manages attendance and discipline
+   • Sales Executive    — manages the Admissions CRM sales pipeline (NEW)
+
+
+--------------------------------------------------------------------------------
+  WHAT'S NEW: THE ADMISSIONS CRM (for the Sales Team)
+--------------------------------------------------------------------------------
+The CRM ("Customer Relationship Management") is where your admissions/sales
+counsellors manage prospective students. Think of it as the sales funnel:
+
+   NEW → CONTACTED → QUALIFIED → COUNSELING → APPLICATION → ADMITTED →
+   ENROLLED (won)      ... or ... LOST (didn't join)
+
+For each lead (prospective student) the CRM stores:
+   - Name, phone, email, city
+   - Where the enquiry came from (Website, Referral, Walk-in, Education Fair…)
+   - Which course/batch they want
+   - Which counsellor owns the lead
+   - Estimated course fee (so you can see total pipeline value in ₹)
+   - A "lead score" (0–100) showing how hot the prospect is
+   - A follow-up date
+   - A full timeline of every call, email, WhatsApp, meeting, and site visit
+
+When a lead finally joins, the counsellor clicks "Convert to Cadet" and the
+system automatically creates a cadet record with a fresh roll number — no
+double data entry.
+
+The Sales Executive login is:
+   Email:    sales@paramount.in
+   Password: paramount123
+
+
+================================================================================
+  THE BIG PICTURE — 3 FREE SERVICES WORK TOGETHER
+================================================================================
+
+To run online, this app needs three things. All three have FREE plans:
+
+   1. GitHub   — a safe online locker that STORES your code.
+   2. Neon     — an online PostgreSQL DATABASE that stores your data
+                 (cadets, leads, scores, etc.).
+   3. Vercel   — the HOST that runs the website and serves it to visitors.
+
+And you already have:
+   4. GoDaddy  — where you bought the domain  paramountmerchantnavy.com
+
+The flow is:  Your code lives on GitHub → Vercel runs it → it saves data in
+Neon → visitors reach it through your GoDaddy domain.
+
+
+================================================================================
+  TABLE OF CONTENTS
+================================================================================
+   PART 1 — Create your 3 free accounts
+   PART 2 — Put the code on GitHub
+   PART 3 — Create the database on Neon
+   PART 4 — Deploy the app on Vercel
+   PART 5 — Fill the database with tables + demo data
+   PART 6 — Connect your GoDaddy domain
+   PART 7 — Test the live website (including the CRM)
+   PART 8 — IMPORTANT: secure the app before real use
+   PART 9 — Day-to-day running (updates, backups, adding staff)
+   PART 10 — Troubleshooting
+   PART 11 — Quick reference card
+
+
+================================================================================
+  PART 1 — CREATE YOUR 3 FREE ACCOUNTS
+================================================================================
+
+Do all three now so they're ready. Use the SAME email for all three if you can.
+
+  1.1  GitHub
+       → Go to  https://github.com  → click "Sign up".
+       → Enter email, password, username (example: paramount-navy).
+       → Confirm the code they email you.
+
+  1.2  Neon (the database)
+       → Go to  https://neon.tech  → click "Sign Up".
+       → Choose "Continue with GitHub" (fastest). Approve.
+
+  1.3  Vercel (the host)
+       → Go to  https://vercel.com  → click "Sign Up".
+       → Choose "Continue with GitHub". Approve.
+       → When asked for a plan, pick "Hobby" (Free).
+
+  ✅ You now have all the accounts you need.
+
+
+================================================================================
+  PART 2 — PUT THE CODE ON GITHUB
+================================================================================
+
+  2.1  Create an empty storage locker (a "repository")
+       a. Sign in to GitHub.
+       b. Click the "+" (top-right) → "New repository".
+       c. Repository name:  paramount-opsengine
+       d. Choose "Private" (only you can see it).
+       e. Do NOT tick "Add a README" or any checkbox.
+       f. Click the green "Create repository".
+       g. Keep this page open.
+
+  2.2  Prepare the code folder on your computer
+       a. Find the project folder (the one with files like package.json,
+          the "src" folder, "scripts" folder, etc.).
+       b. IF THEY EXIST, delete these two items — they are huge and rebuilt
+          automatically, so they must NOT be uploaded:
+              • the folder named   node_modules
+              • the folder named   .next
+       c. Make sure hidden files (names starting with a dot, like .gitignore
+          and .env.example) are visible:
+              Windows: File Explorer → View → Show → Hidden items
+              Mac:     press  Cmd + Shift + .   (dot)
+
+  2.3  Upload via drag-and-drop (easiest, no software needed)
+       a. On the GitHub repository page, click the link
+          "uploading an existing file".
+       b. Open your project folder, select EVERYTHING INSIDE it
+          (Ctrl+A on Windows, Cmd+A on Mac) — select the contents, not the
+          folder itself.
+       c. Drag them into the GitHub upload area.
+       d. Wait for all files to finish uploading (2–5 minutes).
+       e. In the "Commit changes" box at the bottom, type:  first upload
+       f. Click "Commit changes".
+
+  ⚠ SECURITY NOTE: If a file literally named  .env  is in your folder and
+     contains a real password, do NOT upload it. Passwords belong in Vercel
+     (Part 4), not in GitHub. It is fine to upload  .env.example  (a template
+     with no real secrets).
+
+  ✅ Your code now lives safely on GitHub.
+
+
+================================================================================
+  PART 3 — CREATE THE DATABASE ON NEON
+================================================================================
+
+  3.1  Create the database project
+       a. Sign in at  https://neon.tech.
+       b. Click "Create Project" (or "New Project").
+       c. Fill in:
+              Project name:      paramount-opsengine
+              Database name:     app_db
+              Region:            pick the one nearest India, e.g.
+                                 "Asia Pacific (Singapore)" or
+                                 "Europe (Frankfurt)"
+              Postgres version:  leave default
+       d. Click "Create Project".
+
+  3.2  Copy the connection string (this is your database's address+password)
+       a. After creation, Neon shows a box called "Connection string".
+       b. Turn ON "Connection pooling" (or pick the option that says
+          "Pooled connection"). This is important so the website doesn't run
+          out of connections.
+       c. Click the copy icon. The string looks like this (yours will differ):
+
+              postgresql://neondb_owner:AbC123xyz@ep-cool-name-12345-pooler.
+              ap-southeast-1.aws.neon.tech/app_db?sslmode=require
+
+       d. Paste it into Notepad/TextEdit and save it. Label it
+          "DATABASE_URL". You will use it TWICE — in Part 4 and Part 5.
+
+  🔒 Treat this string like a password. Never post it publicly.
+
+  ✅ Your database exists (but it is empty — Part 5 fills it).
+
+
+================================================================================
+  PART 4 — DEPLOY THE APP ON VERCEL
+================================================================================
+
+  4.1  Import your GitHub code into Vercel
+       a. Sign in at  https://vercel.com.
+       b. Click "Add New..." → "Project".
+       c. You'll see your GitHub repositories. Find "paramount-opsengine"
+          and click "Import".
+       d. If it's not listed: click "Adjust GitHub App Permissions", give
+          Vercel access to the repository, then return.
+
+  4.2  Set up the project (BEFORE clicking Deploy)
+       On the "Configure Project" screen:
+       a. Framework Preset: should auto-show "Next.js" — leave it.
+       b. Root Directory: leave as  ./
+       c. Build settings: leave all defaults.
+       d. Open the "Environment Variables" section and add TWO entries.
+          For each: type the Name, paste the Value, click "Add".
+
+          ENTRY 1
+             Name:   DATABASE_URL
+             Value:  (paste the Neon pooled string from Part 3.2)
+
+          ENTRY 2
+             Name:   AUTH_SECRET
+             Value:  any long random secret text. Easy way to make one:
+                       • go to  https://www.uuidgenerator.net/
+                       • copy the UUID shown
+                       • paste it in twice, back to back, so it's extra long
+                     Example (MAKE YOUR OWN — do not copy this one):
+                       6b1e9c2a-...-a7f3   6b1e9c2a-...-a7f3
+
+  4.3  Deploy
+       a. Click the big "Deploy" button.
+       b. Wait 2–4 minutes while it builds. You'll see a log scrolling.
+       c. When done you'll see confetti 🎉. Click "Continue to Dashboard".
+       d. At the top, note the temporary web address, e.g.
+              https://paramount-opsengine-xxxx.vercel.app
+
+  ⚠ If you open it and log in NOW, it will FAIL — the database has no tables
+     yet. That is expected. Part 5 fixes it.
+
+  ✅ The app is deployed. It just needs its database set up.
+
+
+================================================================================
+  PART 5 — FILL THE DATABASE WITH TABLES + DEMO DATA
+================================================================================
+
+Right now Neon is an empty database. We must (a) create the tables and
+(b) load the demo data (25 cadets, 18 CRM leads, medical audits, viva
+scores, CBT ranks, staff logins).
+
+The reliable way is to run two commands from your own computer, ONE TIME.
+It takes about 10 minutes of setup. Follow carefully.
+
+  5.1  Install Node.js (only needed for this one-time step)
+       a. Go to  https://nodejs.org
+       b. Download the button that says "LTS".
+       c. Run the installer, accept all defaults.
+       d. Restart your computer.
+
+  5.2  Open a command window INSIDE the project folder
+       Windows:
+          • Open the project folder in File Explorer.
+          • Click the address bar, type   cmd   and press Enter.
+       Mac:
+          • Open the Terminal app.
+          • Type   cd   then a SPACE, then drag the project folder into the
+            window, then press Enter.
+
+  5.3  Point the project at your Neon database
+       a. In the project folder, create a new plain text file named exactly:
+              .env
+          (If Windows won't let you name it starting with a dot, name it
+           ".env." — Windows removes the trailing dot automatically.)
+       b. Open it and type ONE line, pasting your Neon string:
+
+              DATABASE_URL=postgresql://neondb_owner:....../app_db?sslmode=require
+
+       c. Save and close the file.
+
+  5.4  Run these commands ONE AT A TIME (type each, press Enter, wait)
+
+              npm install
+              npx drizzle-kit push
+              npx tsx scripts/seed.ts
+
+       • "npm install"       downloads the building blocks (1–3 min).
+       • "drizzle-kit push"  creates all the tables in Neon.
+       • "tsx scripts/seed"  loads the demo data.
+
+       After the last command you should see:
+              ✓ 25 cadets
+              ✓ 10 medical audits
+              ✓ 15 viva evaluations
+              ✓ CBT exam dataset (AIR 1–25)
+              ✓ 5 disciplinary logs
+              ✓ Nightly roll-call entries
+              ✓ 18 CRM leads
+              ✓ 36 CRM activities
+              Seed complete. ⚓
+
+  5.5  Verify it worked
+       a. In Neon's website, click "Tables" in the left menu.
+       b. You should see tables including: users, cadets, leads,
+          lead_activities, viva_scores, cbt_scores, medical_audits,
+          disciplinary_logs, roll_calls.
+       c. Click "leads" — you should see 18 rows.
+       d. Click "cadets" — you should see 25 rows.
+
+  5.6  Log in for the first time
+       a. Open your Vercel address (…vercel.app) from Part 4.3.
+       b. On the login screen you can click any demo role button, or type:
+              Email:    coo@paramount.in
+              Password: paramount123
+       c. You should land on the Command Center with live numbers. 🎉
+       d. To test the sales team view, log out and log in as:
+              Email:    sales@paramount.in
+              Password: paramount123
+          Then click "📈 Admissions CRM" — you'll see the sales pipeline
+          board with 18 demo leads across the stages.
+
+  ✅ The app is fully working on the temporary Vercel address. Last step:
+     put it on your real domain.
+
+
+================================================================================
+  PART 6 — CONNECT YOUR GODADDY DOMAIN
+================================================================================
+
+Goal: make the site open at  https://paramountmerchantnavy.com  instead of
+the long …vercel.app address.
+
+  6.1  Tell Vercel about your domain
+       a. In Vercel, open your project → click the "Settings" tab (top).
+       b. In the left menu, click "Domains".
+       c. In the box, type:   paramountmerchantnavy.com   → click "Add".
+       d. Choose the recommended option:
+              "Redirect www.paramountmerchantnavy.com →
+               paramountmerchantnavy.com"
+          → click "Add".
+       e. Vercel now shows "Invalid Configuration" and lists the DNS records
+          you must create at GoDaddy. They look like this (use YOUR values):
+
+              Type   Name   Value
+              ────   ────   ─────────────────────
+              A      @      76.76.21.21
+              CNAME  www    cname.vercel-dns.com
+
+          Keep this Vercel tab OPEN — you'll copy from it.
+
+  6.2  Open the DNS settings at GoDaddy
+       a. In a new tab, sign in at  https://godaddy.com.
+       b. Top-right: your name → "My Products".
+       c. Find  paramountmerchantnavy.com → click the "..." → "Manage DNS"
+          (or click the domain, then "DNS").
+
+  6.3  Remove GoDaddy's default "parking" records
+       a. In the records table, find and DELETE:
+              • the  A  record with Name  @  (points to a GoDaddy IP)
+              • the  CNAME  record with Name  www
+         (Click the pencil/edit icon → Delete/Remove → confirm.)
+       b. DO NOT touch records of type  NS  or  SOA.
+       c. DO NOT touch any  MX  records (those run your email).
+
+  6.4  Add Vercel's two records
+       RECORD 1 (the main domain):
+              Type:  A
+              Name:  @
+              Value: 76.76.21.21     ← use EXACTLY what Vercel showed you
+              TTL:   1 Hour (or default)
+          → Save.
+
+       RECORD 2 (the www version):
+              Type:  CNAME
+              Name:  www
+              Value: cname.vercel-dns.com   ← use EXACTLY what Vercel showed
+              TTL:   1 Hour (or default)
+          → Save.
+
+  6.5  Wait, then confirm
+       a. DNS changes spread across the internet in anywhere from 5 minutes
+          to a few hours (occasionally up to 48h).
+       b. Go back to the Vercel "Domains" page and refresh every few minutes.
+          The status changes:  Invalid → Valid Configuration → Certificate
+          Issued (green tick ✓).
+       c. You can also check progress at  https://dnschecker.org  (enter
+          paramountmerchantnavy.com, type A — you want to see 76.76.21.21).
+
+  ✅ Once Vercel shows green ticks for both the domain and the www version,
+     you're live.
+
+
+================================================================================
+  PART 7 — TEST THE LIVE WEBSITE (INCLUDING THE CRM)
+================================================================================
+
+  a. Open a private/incognito browser window.
+  b. Visit:  https://paramountmerchantnavy.com
+       → You should see the Paramount OpsEngine login page with a padlock 🔒
+         (free SSL certificate — automatic).
+  c. Visit:  https://www.paramountmerchantnavy.com
+       → It should redirect to the non-www version.
+  d. Log in as the Sales Executive to check the CRM:
+       Email: sales@paramount.in   Password: paramount123
+       • Click "📈 Admissions CRM".
+       • Try the "Pipeline" and "Table" view buttons.
+       • Click a lead card to open its detail panel.
+       • Try "Log Activity" (add a note/call).
+       • Drag a lead forward using the "Move stage" dropdown.
+       • On an ADMITTED lead, try "Convert to Cadet" — it should create a
+         new cadet with a fresh roll number.
+  e. Log in as the COO (coo@paramount.in / paramount123) and confirm you can
+     edit cadets, hostels, medical, AND the CRM.
+  f. Log in as the Director General (dg@paramount.in / paramount123) and
+     confirm everything is view-only (no edit buttons).
+
+  ✅ If all that works, congratulations — you are fully live!
+
+
+================================================================================
+  PART 8 — IMPORTANT: SECURE THE APP BEFORE REAL USE
+================================================================================
+
+The demo accounts all share the password  paramount123. Before real staff
+and real cadet/lead data go in, you MUST change these.
+
+  8.1  Simple approach (ask a developer for 15 minutes)
+       Have a developer:
+         • Edit  scripts/seed.ts  to set real names and strong passwords for
+           each role (including the Sales Executive), OR
+         • Add new staff rows directly, using the password-hashing method in
+           src/lib/auth.ts (passwords are stored as secure SHA-256 hashes,
+           never as plain text).
+
+  8.2  If you do it yourself via Neon
+       Passwords are NOT stored as plain text, so you cannot just type a new
+       one into the table. You need the hashed value. The safest path is to
+       re-run the seed with new passwords (developer task). Do not skip this
+       step for a production system.
+
+  8.3  Keep your secrets safe
+       • Never share the Neon DATABASE_URL or the Vercel AUTH_SECRET.
+       • Never commit a real  .env  file to GitHub.
+
+
+================================================================================
+  PART 9 — DAY-TO-DAY RUNNING
+================================================================================
+
+  MAKING CHANGES TO THE WEBSITE
+     Any change you save (commit) on GitHub is automatically rebuilt and
+     published by Vercel within ~2 minutes. No manual redeploy needed.
+     To edit a file on GitHub: open it → click the pencil ✏ → make changes →
+     "Commit changes" → choose "Commit directly to main".
+
+  ADDING A NEW STAFF LOGIN (e.g. another sales counsellor)
+     Ask a developer to add a row to the  users  table with a hashed
+     password and the correct role (SALES_EXECUTIVE for a counsellor).
+     Note: leads in the CRM can be assigned to any counsellor name you type,
+     even before they have a login.
+
+  BACKING UP YOUR DATA
+     • Neon's free plan keeps 7 days of automatic point-in-time backups.
+       Restore from the "Branches" section in Neon if needed.
+     • For extra safety, export data monthly from Neon's SQL Editor.
+
+  MONITORING
+     • Vercel dashboard: visitor counts, errors, build history.
+     • Neon dashboard: database size and performance.
+     • Both email you if something breaks.
+
+  TYPICAL COSTS (verify current pricing yourself)
+     • Vercel Hobby:  Free (fine for internal use)
+     • Neon Free:     Free (0.5 GB — plenty for cadets + leads)
+     • GoDaddy domain: about ₹1,000 / year renewal
+     • Rough total:   about ₹100 / month
+
+
+================================================================================
+  PART 10 — TROUBLESHOOTING
+================================================================================
+
+  "This site can't be reached" at paramountmerchantnavy.com
+     → DNS hasn't spread yet. Wait 30 min and retry.
+     → Confirm you deleted GoDaddy's old parking A and CNAME records (6.3).
+     → Check status at  https://dnschecker.org.
+
+  Login says "Invalid credentials"
+     → Password is exactly  paramount123  (all lowercase, case-sensitive).
+     → Confirm you ran the seed (Part 5). The  users  table should have
+       6 rows (including sales@paramount.in).
+
+  Login works but a page shows "Something went wrong"
+     → DATABASE_URL in Vercel is wrong/missing. Vercel → Settings →
+       Environment Variables → fix it → then Deployments tab → "Redeploy".
+
+  The CRM (or another page) is empty when it shouldn't be
+     → The seed didn't load that table. Re-run  npx tsx scripts/seed.ts
+       from your computer (Part 5). If it says "already seeded — skipping",
+       the data is actually there; just refresh the page.
+
+  "Too many database connections"
+     → Your DATABASE_URL must be the POOLED string (has  -pooler  in the
+       address). Copy the pooled version from Neon and update it in Vercel,
+       then redeploy.
+
+  "SSL certificate error" right after connecting the domain
+     → Vercel needs 5–10 min to issue the certificate after DNS goes valid.
+       Wait and reload.
+
+  Changes pushed to GitHub aren't showing on the live site
+     → Vercel → Deployments tab. If the newest build has a red ✗, click it
+       to read the error. If it's green ✓, hard-refresh your browser
+       (Ctrl+Shift+R / Cmd+Shift+R).
+
+  "Convert to Cadet" fails saying email already exists
+     → A cadet with that email is already enrolled. Edit the lead's email or
+       remove the duplicate cadet, then convert again.
+
+
+================================================================================
+  PART 11 — QUICK REFERENCE CARD
+================================================================================
+
+  LIVE SITE:        https://paramountmerchantnavy.com
+  Vercel:           https://vercel.com/dashboard
+  Neon (database):  https://console.neon.tech
+  GitHub (code):    https://github.com/YOUR-USERNAME/paramount-opsengine
+  GoDaddy DNS:      https://dcc.godaddy.com/manage/dns
+
+  DNS RECORDS AT GODADDY (use the exact values Vercel shows you):
+     A      @     76.76.21.21
+     CNAME  www   cname.vercel-dns.com
+
+  VERCEL ENVIRONMENT VARIABLES:
+     DATABASE_URL   = your Neon POOLED connection string
+     AUTH_SECRET    = a long random secret text
+
+  ONE-TIME DATABASE SETUP COMMANDS (run from the project folder):
+     npm install
+     npx drizzle-kit push
+     npx tsx scripts/seed.ts
+
+  DEMO LOGINS  (password for all = paramount123 — CHANGE BEFORE LAUNCH):
+     dg@paramount.in         Director General   (view-only, everything)
+     coo@paramount.in        COO                (cadets, hostel, medical, CRM)
+     campus@paramount.in     Campus Manager     (same as COO)
+     academics@paramount.in  Academic Lead      (CBT exams, vivas)
+     warden@paramount.in     Chief Warden       (attendance, discipline)
+     sales@paramount.in      Sales Executive    (Admissions CRM pipeline)
+
+  MENU SECTIONS:
+     📊 Command Center · 📈 Admissions CRM · 🎖️ Cadet Directory ·
+     🏢 Hostel & Discipline · 🩺 Medical Pre-Screen · ⚓ Sponsorship Vivas ·
+     📝 CBT Examination Hub
+
+  Fair winds and following seas! ⚓
+================================================================================

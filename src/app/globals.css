@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy-950: #060f21;
+  --color-navy-900: #0a192f;
+  --color-navy-800: #112240;
+  --color-navy-700: #1d3557;
+  --color-navy-600: #2a4a73;
+  --color-gold-300: #e8cd6f;
+  --color-gold-400: #dfc257;
+  --color-gold-500: #d4af37;
+  --color-gold-600: #b8952b;
+}
+
+::selection {
+  background: #d4af37;
+  color: #0a192f;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fade-up 0.25s ease-out;
+}
+
+@keyframes slide-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.animate-slide-in {
+  animation: slide-in-right 0.25s ease-out;
+}
+
+input[type="range"].gold-range {
+  accent-color: #d4af37;
+}
